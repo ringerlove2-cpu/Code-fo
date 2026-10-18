@@ -1,0 +1,642 @@
+```html
+<!DOCTYPE html>
+<html lang="hi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Small Prediction & Analysis Tool</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gamingDark: '#0b0f19',
+                        gamingCard: '#151c2c',
+                        gamingBorder: '#2a364f',
+                        neonGreen: '#00ff88',
+                        neonRed: '#ff3366',
+                        neonGold: '#ffb703',
+                        neonPurple: '#9d4edd',
+                        neonBlue: '#00f0ff'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(157, 78, 221, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(0, 240, 255, 0.12) 0%, transparent 40%);
+        }
+        
+        .glow-green {
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+        .glow-red {
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.5);
+        }
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(255, 183, 3, 0.4);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a364f;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-3 md:p-6 text-slate-100">
+
+    <!-- Top Navigation / Header -->
+    <header class="max-w-6xl w-full mx-auto mb-6 flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-gamingBorder pb-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neonPurple to-neonBlue flex items-center justify-center font-black text-xl shadow-lg glow-purple">
+                <i class="fa-solid fa-gamepad text-slate-900"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-neonBlue via-slate-100 to-neonGreen">
+                    VEER.GAME ANALYZER
+                </h1>
+                <p class="text-xs text-slate-400">Advanced Big/Small Trend Simulation & History Analyzer</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 bg-gamingCard px-3 py-1.5 rounded-full border border-gamingBorder">
+            <span class="w-2.5 h-2.5 rounded-full bg-neonGreen animate-pulse"></span>
+            <span class="text-xs font-semibold text-slate-300">Algorithm Status: <span class="text-neonGreen">Active</span></span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+
+        <!-- Left Column: Prediction Panel & Input Controls -->
+        <section class="lg:col-span-5 space-y-6">
+            
+            <!-- Prediction Box -->
+            <div class="bg-gamingCard border border-gamingBorder rounded-2xl p-5 relative overflow-hidden shadow-2xl">
+                <div class="absolute -right-8 -top-8 w-28 h-28 bg-neonPurple/10 rounded-full blur-2xl"></div>
+                
+                <h2 class="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-neonGold"></i>
+                    Period Prediction Box
+                </h2>
+
+                <form id="predictionForm" onsubmit="event.preventDefault(); predictOutcome();" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">ENTER PERIOD NUMBER (10 or 15 digits)</label>
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                id="periodInput" 
+                                placeholder="e.g. 20261018100010128" 
+                                class="w-full bg-gamingDark border border-gamingBorder focus:border-neonBlue focus:ring-1 focus:ring-neonBlue rounded-xl px-4 py-3 text-sm font-mono text-neonBlue placeholder-slate-600 outline-none transition"
+                                required
+                            />
+                            <button type="button" onclick="autoIncrementPeriod()" title="Increment Period" class="absolute right-2 top-1/2 -translate-y-1/2 bg-gamingBorder hover:bg-slate-700 text-xs px-2.5 py-1.5 rounded-lg transition">
+                                +1
+                            </button>
+                        </div>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        class="w-full py-3.5 px-4 bg-gradient-to-r from-neonBlue to-neonGreen hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-black tracking-wide rounded-xl shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 glow-green flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> PREDICT RESULT
+                    </button>
+                </form>
+
+                <!-- Prediction Result Display -->
+                <div id="resultBox" class="mt-6 border border-gamingBorder bg-gamingDark/80 rounded-xl p-4 text-center hidden transition-all">
+                    <span class="text-xs uppercase tracking-widest text-slate-400 block mb-1">Predicted Outcome</span>
+                    
+                    <div class="flex items-center justify-center gap-4 my-2">
+                        <div id="predNumBadge" class="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl bg-slate-800 border border-slate-700">
+                            -
+                        </div>
+                        <div class="text-left">
+                            <div id="predType" class="text-3xl font-extrabold tracking-wider">
+                                ---
+                            </div>
+                            <div id="predRange" class="text-xs text-slate-400">
+                                Range: --
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-gamingBorder/60 flex justify-around text-xs text-slate-400">
+                        <div>Color: <span id="predColor" class="font-bold text-slate-200">-</span></div>
+                        <div>Confidence: <span id="predConf" class="font-bold text-neonGold">-</span></div>
+                    </div>
+
+                    <button onclick="addCurrentPredictionToHistory()" class="mt-3 w-full py-2 bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-semibold rounded-lg border border-gamingBorder transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus text-neonGreen"></i> Add To History Log
+                    </button>
+                </div>
+            </div>
+
+            <!-- Manual Data Entry Panel -->
+            <div class="bg-gamingCard border border-gamingBorder rounded-2xl p-5 shadow-xl">
+                <h2 class="text-md font-bold text-slate-200 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-neonBlue"></i>
+                    Manual Result Add
+                </h2>
+                <p class="text-xs text-slate-400 mb-3">Apne live game ki history directly add karein pattern analyze karne ke liye.</p>
+                
+                <form id="manualForm" onsubmit="event.preventDefault(); addManualResult();" class="grid grid-cols-12 gap-2">
+                    <div class="col-span-5">
+                        <input type="text" id="manualPeriod" placeholder="Period (e.g. 128)" class="w-full bg-gamingDark border border-gamingBorder rounded-lg px-2.5 py-2 text-xs font-mono text-slate-200 placeholder-slate-600 outline-none focus:border-neonBlue" required>
+                    </div>
+                    <div class="col-span-4">
+                        <input type="number" id="manualNum" min="0" max="9" placeholder="Num (0-9)" class="w-full bg-gamingDark border border-gamingBorder rounded-lg px-2.5 py-2 text-xs font-mono text-slate-200 placeholder-slate-600 outline-none focus:border-neonBlue" required>
+                    </div>
+                    <div class="col-span-3">
+                        <button type="submit" class="w-full h-full bg-neonPurple/20 hover:bg-neonPurple/40 border border-neonPurple text-neonPurple hover:text-white font-bold rounded-lg text-xs transition">
+                            Add
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Strategy Tips -->
+            <div class="bg-gamingCard/60 border border-gamingBorder rounded-2xl p-4 text-xs space-y-2">
+                <div class="font-bold text-neonGold flex items-center gap-1.5">
+                    <i class="fa-solid fa-lightbulb"></i> Hinglish Strategy Guide
+                </div>
+                <ul class="list-disc list-inside text-slate-400 space-y-1">
+                    <li><strong class="text-slate-300">0 to 4:</strong> Small Outcome | <strong class="text-slate-300">5 to 9:</strong> Big Outcome</li>
+                    <li><strong class="text-slate-300">Streak Pattern:</strong> Agar continuous 3-4 Small aayein, to agla Big standard rotation logic par high probability dikhata hai.</li>
+                    <li><strong class="text-slate-300">Number Repeating:</strong> High frequency repeating numbers (jaise 3, 5, 8) ke baad outcome turn check karein.</li>
+                </ul>
+            </div>
+
+        </section>
+
+        <!-- Right Column: Analytics & History Log -->
+        <section class="lg:col-span-7 space-y-6">
+
+            <!-- Stats Overview Dashboard -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <!-- Total Predictions -->
+                <div class="bg-gamingCard border border-gamingBorder rounded-xl p-3.5 text-center">
+                    <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Total Recorded</span>
+                    <span id="statTotal" class="text-xl font-black text-slate-100">0</span>
+                </div>
+                <!-- Big Ratio -->
+                <div class="bg-gamingCard border border-gamingBorder rounded-xl p-3.5 text-center">
+                    <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Big Count</span>
+                    <span id="statBig" class="text-xl font-black text-neonGreen">0 (0%)</span>
+                </div>
+                <!-- Small Ratio -->
+                <div class="bg-gamingCard border border-gamingBorder rounded-xl p-3.5 text-center">
+                    <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Small Count</span>
+                    <span id="statSmall" class="text-xl font-black text-neonRed">0 (0%)</span>
+                </div>
+                <!-- Current Streak -->
+                <div class="bg-gamingCard border border-gamingBorder rounded-xl p-3.5 text-center">
+                    <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Current Streak</span>
+                    <span id="statStreak" class="text-xl font-black text-neonGold">-</span>
+                </div>
+            </div>
+
+            <!-- Deep Frequency Analysis Box -->
+            <div class="bg-gamingCard border border-gamingBorder rounded-2xl p-5 shadow-xl">
+                <h3 class="text-sm font-bold text-slate-200 mb-3 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-neonGreen"></i>
+                        After-Number Analysis (Kitne Small ke baad Big?)
+                    </span>
+                    <button onclick="analyzePattern()" class="text-xs text-neonBlue hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-rotate-right"></i> Refresh
+                    </button>
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Smalls Before Big Counter -->
+                    <div class="bg-gamingDark/80 rounded-xl p-3 border border-gamingBorder/80">
+                        <h4 class="text-xs font-semibold text-slate-400 mb-2 border-b border-gamingBorder pb-1">Continuous Small Runs Before Big</h4>
+                        <div id="smallRunsList" class="space-y-1.5 text-xs text-slate-300 max-h-32 overflow-y-auto pr-1">
+                            <div class="text-slate-500 italic">No data analyzed yet.</div>
+                        </div>
+                    </div>
+
+                    <!-- Number Trigger Frequency -->
+                    <div class="bg-gamingDark/80 rounded-xl p-3 border border-gamingBorder/80">
+                        <h4 class="text-xs font-semibold text-slate-400 mb-2 border-b border-gamingBorder pb-1">Top Numbers Followed By Big</h4>
+                        <div id="numberTriggersList" class="space-y-1.5 text-xs text-slate-300 max-h-32 overflow-y-auto pr-1">
+                            <div class="text-slate-500 italic">No data analyzed yet.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Table -->
+            <div class="bg-gamingCard border border-gamingBorder rounded-2xl p-5 shadow-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                    <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-neonPurple"></i>
+                        Game Pattern History Log
+                    </h3>
+                    <div class="flex items-center gap-2">
+                        <button onclick="loadSampleData()" class="px-2.5 py-1 bg-gamingBorder hover:bg-slate-700 text-xs text-slate-300 rounded-lg transition">
+                            Load Demo Screenshot Data
+                        </button>
+                        <button onclick="clearHistory()" class="px-2.5 py-1 bg-red-950/40 hover:bg-red-900/60 text-neonRed border border-red-800/40 text-xs rounded-lg transition">
+                            Clear Log
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-gamingBorder">
+                    <table class="w-full text-left text-xs font-mono">
+                        <thead class="bg-gamingDark text-slate-400 border-b border-gamingBorder">
+                            <tr>
+                                <th class="p-3">Period</th>
+                                <th class="p-3">Number</th>
+                                <th class="p-3">Big / Small</th>
+                                <th class="p-3">Color</th>
+                                <th class="p-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody" class="divide-y divide-gamingBorder/50">
+                            <tr>
+                                <td colspan="5" class="p-4 text-center text-slate-500 italic">No historical entries found. Click "Load Demo Screenshot Data" to auto-populate history.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-6xl w-full mx-auto border-t border-gamingBorder/60 pt-4 pb-2 text-center text-xs text-slate-500">
+        <p>Disclaimer: Yeh tool keval analytical aur simulation objective ke liye hai. Random Number Generator (RNG) outcomes me 100% precision guarantee nahi hoti.</p>
+    </footer>
+
+    <!-- App Logic JavaScript -->
+    <script>
+        // Global State
+        let historyData = [];
+        let currentPrediction = null;
+
+        // Sample Data from screenshot history provided by user
+        const sampleScreenshotData = [
+            { period: "20261018100010118", number: 9, outcome: "Big", color: "Green" },
+            { period: "20261018100010119", number: 5, outcome: "Big", color: "Purple/Green" },
+            { period: "20261018100010120", number: 5, outcome: "Big", color: "Purple/Green" },
+            { period: "20261018100010121", number: 6, outcome: "Big", color: "Red" },
+            { period: "20261018100010122", number: 3, outcome: "Small", color: "Green" },
+            { period: "20261018100010123", number: 8, outcome: "Big", color: "Red" },
+            { period: "20261018100010124", number: 7, outcome: "Big", color: "Green" },
+            { period: "20261018100010125", number: 3, outcome: "Small", color: "Green" },
+            { period: "20261018100010126", number: 3, outcome: "Small", color: "Green" },
+            { period: "20261018100010127", number: 3, outcome: "Small", color: "Green" },
+            { period: "20261018100010158", number: 0, outcome: "Small", color: "Red/Violet" },
+            { period: "20261018100010159", number: 8, outcome: "Big", color: "Red" },
+            { period: "20261018100010160", number: 6, outcome: "Big", color: "Red" },
+            { period: "20261018100010161", number: 6, outcome: "Big", color: "Red" },
+            { period: "20261018100010162", number: 2, outcome: "Small", color: "Red" },
+            { period: "20261018100010163", number: 8, outcome: "Big", color: "Red" },
+            { period: "20261018100010164", number: 0, outcome: "Small", color: "Red/Violet" },
+            { period: "20261018100010165", number: 5, outcome: "Big", color: "Green/Violet" },
+            { period: "20261018100010166", number: 4, outcome: "Small", color: "Red" },
+            { period: "20261018100010167", number: 5, outcome: "Big", color: "Green/Violet" },
+            { period: "20261018100010168", number: 8, outcome: "Big", color: "Red" },
+            { period: "20261018100010169", number: 6, outcome: "Big", color: "Red" },
+            { period: "20261018100010170", number: 0, outcome: "Small", color: "Red/Violet" },
+            { period: "20261018100010171", number: 4, outcome: "Small", color: "Red" },
+            { period: "20261018100010172", number: 6, outcome: "Big", color: "Red" },
+            { period: "20261018100010173", number: 4, outcome: "Small", color: "Red" },
+            { period: "20261018100010174", number: 2, outcome: "Small", color: "Red" },
+            { period: "20261018100010175", number: 1, outcome: "Small", color: "Green" },
+            { period: "20261018100010176", number: 1, outcome: "Small", color: "Green" },
+            { period: "20261018100010177", number: 7, outcome: "Big", color: "Green" }
+        ];
+
+        // Seeded Pseudo-Random Generator based on Period String
+        function seedRandom(seedStr) {
+            let h = 0;
+            for (let i = 0; i < seedStr.length; i++) {
+                h = Math.imul(31, h) + seedStr.charCodeAt(i) | 0;
+            }
+            return function() {
+                h = Math.imul(48271, h) % 2147483647;
+                return (h & 2147483647) / 2147483647;
+            }
+        }
+
+        // Generate Color Ball based on number
+        function getColorForNumber(num) {
+            if (num === 0) return "Red/Violet";
+            if (num === 5) return "Green/Violet";
+            return (num % 2 === 0) ? "Red" : "Green";
+        }
+
+        // Main Predict Function
+        function predictOutcome() {
+            const periodVal = document.getElementById('periodInput').value.trim();
+            if (!periodVal) return;
+
+            const rng = seedRandom(periodVal);
+            
+            // Generate number (0-9)
+            const num = Math.floor(rng() * 10);
+            const isBig = num >= 5;
+            const outcome = isBig ? "Big" : "Small";
+            const color = getColorForNumber(num);
+            const confidence = (75 + Math.floor(rng() * 20)) + "%";
+
+            currentPrediction = {
+                period: periodVal,
+                number: num,
+                outcome: outcome,
+                color: color
+            };
+
+            // Display Results in Box
+            const resultBox = document.getElementById('resultBox');
+            const predNumBadge = document.getElementById('predNumBadge');
+            const predType = document.getElementById('predType');
+            const predRange = document.getElementById('predRange');
+            const predColor = document.getElementById('predColor');
+            const predConf = document.getElementById('predConf');
+
+            predNumBadge.innerText = num;
+            predType.innerText = outcome.toUpperCase();
+            predRange.innerText = isBig ? "Range: 5 - 9" : "Range: 0 - 4";
+            predColor.innerText = color;
+            predConf.innerText = confidence;
+
+            if (isBig) {
+                predType.className = "text-3xl font-extrabold tracking-wider text-neonGreen";
+                predNumBadge.className = "w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl bg-emerald-950/80 border border-neonGreen text-neonGreen glow-green";
+            } else {
+                predType.className = "text-3xl font-extrabold tracking-wider text-neonRed";
+                predNumBadge.className = "w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl bg-rose-950/80 border border-neonRed text-neonRed glow-red";
+            }
+
+            resultBox.classList.remove('hidden');
+        }
+
+        // Add Prediction to History Log
+        function addCurrentPredictionToHistory() {
+            if (!currentPrediction) return;
+
+            // Check if period already exists
+            const exists = historyData.some(item => item.period === currentPrediction.period);
+            if (exists) {
+                alert('Yeh Period Number pehle se history log me hai!');
+                return;
+            }
+
+            historyData.unshift({ ...currentPrediction });
+            updateUI();
+            autoIncrementPeriod();
+        }
+
+        // Add Manual Result
+        function addManualResult() {
+            const period = document.getElementById('manualPeriod').value.trim();
+            const numVal = document.getElementById('manualNum').value;
+
+            if (!period || numVal === "") return;
+
+            const num = parseInt(numVal, 10);
+            if (num < 0 || num > 9) return;
+
+            const isBig = num >= 5;
+            const outcome = isBig ? "Big" : "Small";
+            const color = getColorForNumber(num);
+
+            historyData.unshift({
+                period: period,
+                number: num,
+                outcome: outcome,
+                color: color
+            });
+
+            document.getElementById('manualForm').reset();
+            updateUI();
+        }
+
+        // Auto Increment Period Input
+        function autoIncrementPeriod() {
+            const periodInput = document.getElementById('periodInput');
+            let val = periodInput.value.trim();
+            if (val) {
+                // Find trailing digits and increment
+                const match = val.match(/(.*?)(\d+)$/);
+                if (match) {
+                    const prefix = match[1];
+                    const numStr = match[2];
+                    const nextNum = (BigInt(numStr) + 1n).toString().padStart(numStr.length, '0');
+                    periodInput.value = prefix + nextNum;
+                }
+            } else {
+                periodInput.value = "20261018100010178";
+            }
+        }
+
+        // Load Sample Screenshot Data
+        function loadSampleData() {
+            historyData = JSON.parse(JSON.stringify(sampleScreenshotData)).reverse();
+            updateUI();
+        }
+
+        // Clear History
+        function clearHistory() {
+            historyData = [];
+            updateUI();
+        }
+
+        // Delete Row
+        function deleteRow(index) {
+            historyData.splice(index, 1);
+            updateUI();
+        }
+
+        // Analysis Algorithms
+        function analyzePattern() {
+            if (historyData.length === 0) {
+                document.getElementById('smallRunsList').innerHTML = '<div class="text-slate-500 italic">Data empty hai. History add karein.</div>';
+                document.getElementById('numberTriggersList').innerHTML = '<div class="text-slate-500 italic">Data empty hai. History add karein.</div>';
+                return;
+            }
+
+            // Reverse for chronological processing (oldest to newest)
+            const chronoData = [...historyData].reverse();
+
+            // 1. Analyze Continuous Smalls before a Big
+            let smallStreak = 0;
+            const runCounts = {}; // { 1: count, 2: count, ... }
+            const triggerNumbers = {}; // { number: big_count }
+
+            for (let i = 0; i < chronoData.length; i++) {
+                const current = chronoData[i];
+
+                if (current.outcome === "Small") {
+                    smallStreak++;
+                } else if (current.outcome === "Big") {
+                    if (smallStreak > 0) {
+                        runCounts[smallStreak] = (runCounts[smallStreak] || 0) + 1;
+                        smallStreak = 0;
+                    }
+
+                    // Check which number preceded this Big
+                    if (i > 0) {
+                        const prevNumber = chronoData[i - 1].number;
+                        triggerNumbers[prevNumber] = (triggerNumbers[prevNumber] || 0) + 1;
+                    }
+                }
+            }
+
+            // Render Continuous Smalls
+            const smallRunsList = document.getElementById('smallRunsList');
+            const runKeys = Object.keys(runCounts).sort((a, b) => Number(a) - Number(b));
+            
+            if (runKeys.length === 0) {
+                smallRunsList.innerHTML = '<div class="text-slate-500 italic">Koi Small -> Big transition nahi mila.</div>';
+            } else {
+                smallRunsList.innerHTML = runKeys.map(k => `
+                    <div class="flex justify-between items-center bg-gamingDark px-2 py-1 rounded border border-gamingBorder/60">
+                        <span><strong class="text-neonRed">${k} Small</strong> ke baad Big:</span>
+                        <span class="font-bold text-neonGold">${runCounts[k]} baar</span>
+                    </div>
+                `).join('');
+            }
+
+            // Render Trigger Numbers
+            const numberTriggersList = document.getElementById('numberTriggersList');
+            const triggerKeys = Object.keys(triggerNumbers).sort((a, b) => triggerNumbers[b] - triggerNumbers[a]);
+
+            if (triggerKeys.length === 0) {
+                numberTriggersList.innerHTML = '<div class="text-slate-500 italic">Koi Number transition data nahi mila.</div>';
+            } else {
+                numberTriggersList.innerHTML = triggerKeys.map(num => `
+                    <div class="flex justify-between items-center bg-gamingDark px-2 py-1 rounded border border-gamingBorder/60">
+                        <span>Number <strong class="text-neonBlue">${num}</strong> ke baad Big:</span>
+                        <span class="font-bold text-neonGreen">${triggerNumbers[num]} baar</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Update Stats Overview Panel
+        function updateStats() {
+            const total = historyData.length;
+            if (total === 0) {
+                document.getElementById('statTotal').innerText = "0";
+                document.getElementById('statBig').innerText = "0 (0%)";
+                document.getElementById('statSmall').innerText = "0 (0%)";
+                document.getElementById('statStreak').innerText = "-";
+                return;
+            }
+
+            const bigs = historyData.filter(d => d.outcome === "Big").length;
+            const smalls = historyData.filter(d => d.outcome === "Small").length;
+
+            const bigPct = ((bigs / total) * 100).toFixed(0);
+            const smallPct = ((smalls / total) * 100).toFixed(0);
+
+            // Calculate current streak
+            let streakType = historyData[0].outcome;
+            let streakCount = 0;
+            for (let i = 0; i < historyData.length; i++) {
+                if (historyData[i].outcome === streakType) {
+                    streakCount++;
+                } else {
+                    break;
+                }
+            }
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statBig').innerText = `${bigs} (${bigPct}%)`;
+            document.getElementById('statSmall').innerText = `${smalls} (${smallPct}%)`;
+
+            const streakElem = document.getElementById('statStreak');
+            streakElem.innerText = `${streakCount} ${streakType}`;
+            streakElem.className = `text-xl font-black ${streakType === 'Big' ? 'text-neonGreen' : 'text-neonRed'}`;
+        }
+
+        // Render Table & UI Refresh
+        function updateUI() {
+            const tbody = document.getElementById('historyTableBody');
+
+            if (historyData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="p-4 text-center text-slate-500 italic">No historical entries found. Click "Load Demo Screenshot Data" to auto-populate history.</td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = historyData.map((item, index) => {
+                    const isBig = item.outcome === "Big";
+                    const badgeClass = isBig 
+                        ? "bg-emerald-950 text-neonGreen border-neonGreen/40" 
+                        : "bg-rose-950 text-neonRed border-neonRed/40";
+                    
+                    return `
+                        <tr class="hover:bg-gamingDark/50 transition">
+                            <td class="p-3 text-slate-300 font-mono">${item.period}</td>
+                            <td class="p-3 font-bold text-slate-100">${item.number}</td>
+                            <td class="p-3">
+                                <span class="px-2 py-0.5 rounded border text-[11px] font-bold ${badgeClass}">
+                                    ${item.outcome}
+                                </span>
+                            </td>
+                            <td class="p-3 text-slate-400 text-[11px]">${item.color}</td>
+                            <td class="p-3 text-right">
+                                <button onclick="deleteRow(${index})" class="text-slate-500 hover:text-red-400 transition">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            updateStats();
+            analyzePattern();
+        }
+
+        // Initialize Default Period
+        window.onload = function() {
+            document.getElementById('periodInput').value = "20261018100010178";
+            document.getElementById('manualPeriod').value = "178";
+            // Pre-load sample screenshot data on start
+            loadSampleData();
+        };
+    </script>
+</body>
+</html>
+```
